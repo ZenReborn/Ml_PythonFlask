@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Horsepower → MPG Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 40px;}
+    input[type=number] { width: 120px; padding: 6px; }
+    button { padding: 6px 12px; }
+    .result { margin-top: 12px; font-weight: bold; }
+    .plot { margin-top: 20px; max-width: 600px; }
+  </style>
+</head>
+<body>
+  <h2>Horsepower → MPG predictor (Flask + TensorFlow)</h2>
+
+  <p>Enter a horsepower value and click <strong>Predict</strong>.</p>
+
+  <div>
+    <label for="hp">Horsepower:</label>
+    <input id="hp" type="number" step="any" value="150">
+    <button id="btn">Predict</button>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="plot">
+    <h4>Training: original points and learned fit</h4>
+    <img src="/model/plot" alt="fit plot" style="max-width:100%;">
+  </div>
+
+  <script>
+    document.getElementById("btn").addEventListener("click", async () => {
+      const hp = parseFloat(document.getElementById("hp").value);
+      const resEl = document.getElementById("result");
+      resEl.textContent = "Predicting...";
+      try {
+        const resp = await fetch("/predict", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({horsepower: hp})
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          resEl.textContent = "Error: " + (data.error || resp.statusText);
+          return;
+        }
+        resEl.textContent = `Horsepower: ${data.horsepower} → Predicted MPG: ${data.mpg.toFixed(2)}`;
+      } catch (err) {
+        resEl.textContent = "Request failed: " + err;
+      }
+    });
+  </script>
+</body>
+</html>
