@@ -19,3 +19,4 @@ python train.py
 python app.py
 
 5. Finally open http://127.0.0.1:5000/ in web browsr
+Done
